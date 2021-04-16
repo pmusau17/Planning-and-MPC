@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  
+     <rosparam file="$(find hmpc_auto_race)/hmpc_params.yaml" command="load"/>
+     <node pkg="hmpc_auto_race" type="hmpc_node" name="mpc_node" output="screen"/>
+     <!-- args="$(arg wall_points) $(arg algorithm_name) $(arg world_name) $(arg velocity) $(arg wall_time)" -->
+</launch>

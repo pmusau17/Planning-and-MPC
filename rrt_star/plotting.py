@@ -26,19 +26,14 @@ class Plotting:
         self.obs_rectangle = self.env.obs_rectangle()
         self.fig, self.ax = plt.subplots()
     
-    def animation(self,nodelist,path,name, animation=False):
+    def animation(self,nodelist,path,name, animation=False,block=False):
         # plot the grid
+        self.ax.clear()
         self.plot_grid(name)
         # plot visited nodes
         self.plot_visited(nodelist, animation)
         # plot the final path 
-        self.plot_path(path)
-
-    
-    def animation_connect(self, V1, V2, path, name):
-        self.plot_grid(name)
-        self.plot_visited_connect(V1, V2)
-        self.plot_path(path)
+        self.plot_path(path,block=block)
 
     
     # plot the 2d grid
@@ -105,36 +100,10 @@ class Plotting:
                 if node.parent:
                     plt.plot([node.parent.x, node.x], [node.parent.y, node.y], "-g")
 
-    
-
-    # Not exactly sure yet but we will get there
-    # Looks like plotting two sets of vertices not sure how this works
-    @staticmethod
-    def plot_visited_connect(V1, V2):
-        len1, len2 = len(V1), len(V2)
-
-        for k in range(max(len1, len2)):
-            if k < len1:
-                if V1[k].parent:
-                    plt.plot([V1[k].x, V1[k].parent.x], [V1[k].y, V1[k].parent.y], "-g")
-            if k < len2:
-                if V2[k].parent:
-                    plt.plot([V2[k].x, V2[k].parent.x], [V2[k].y, V2[k].parent.y], "-g")
-
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                                         lambda event: [exit(0) if event.key == 'escape' else None])
-
-            if k % 2 == 0:
-                plt.pause(0.001)
-
-        plt.pause(0.01)
-
-
-
     # plotting a path via list comprehensions
     #@staticmethod
-    def plot_path(self,path):
+    def plot_path(self,path,block=False):
         if len(path) != 0:
             self.ax.plot([x[0] for x in path], [x[1] for x in path], '-r', linewidth=2)
             plt.pause(0.01)
-        plt.show(block=False)
+        plt.show(block=block)

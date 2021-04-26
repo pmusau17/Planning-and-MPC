@@ -225,7 +225,8 @@ class RrtStar:
         if len(node_index) > 0:
             cost_list = [dist_list[i] + self.cost(self.list_of_vertices[i]) for i in node_index
                          if not self.utils.is_collision(self.list_of_vertices[i], self.s_goal)]
-            return node_index[int(np.argmin(cost_list))]
+            if(len(cost_list)>0):
+                return node_index[int(np.argmin(cost_list))]
         
 
         ## TBD: need to grok this a little more
@@ -271,6 +272,13 @@ class RrtStar:
         dist, _ = self.get_distance_and_angle(node_start, node_end)
 
         return self.cost(node_start) + dist
+
+
+    """
+        Function that plots final solution obtained
+    """
+    def plot_final(self):
+        self.plotting.animation(self.list_of_vertices, self.path, "rrt*, N = " + str(self.iter_max),True,True)
 
 
     """
@@ -327,6 +335,7 @@ def main():
     # x_start, x_goal, step length, search radius, number of samples
     rrt_star = RrtStar(x_start, x_goal, 10, 0.10, 20, 100,x_width,y_width)
     rrt_star.planning()
+    rrt_star.plot_final()
 
 
 if __name__ == '__main__':

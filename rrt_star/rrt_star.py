@@ -85,8 +85,8 @@ class RrtStar:
             node_new = self.new_state(node_near, node_rand)
 
             # print the sample number 
-            if k % 500 == 0:
-                print("Sample Number: ",k)
+            if k % 10 == 0:
+                print("Sample Number: ",k,"Number of vertices",len(self.list_of_vertices))
 
             # get a new node and if the ray connecting the new node with near node 
             # is collision free then we can add the vertex to our list of nodes
@@ -312,28 +312,22 @@ class RrtStar:
     """
     @staticmethod
     def nearest_neighbor(node_list, n):
-        return node_list[int(np.argmin([math.hypot(nd.x - n.x, nd.y - n.y)
+        return node_list[int(np.argmin([np.linalg.norm([nd.x - n.x, nd.y - n.y])
                                         for nd in node_list]))]
-
-
-    
-   
-        
-
 
 
 
 def main():
     x_start = (18, 8)  # Starting node
     x_goal = (37, 18)
-    x_width = 50 
-    y_width = 30
+    x_width = 100 
+    y_width = 60
     #plotting.Plotting(x_start, x_goal,x_width,y_width).plot_grid("Test")
 
 
     # call order
     # x_start, x_goal, step length, search radius, number of samples
-    rrt_star = RrtStar(x_start, x_goal, 10, 0.10, 20, 100,x_width,y_width)
+    rrt_star = RrtStar(x_start, x_goal, 10, 0.10, 20, 200,x_width,y_width)
     rrt_star.planning()
     rrt_star.plot_final()
 

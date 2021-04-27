@@ -18,9 +18,10 @@ class Node:
 
 if __name__=="__main__":
     grid=np.load('porto_grid.npy')
-    #grid[2210:2270]
-    print(grid.shape)
-    plt.imshow(grid)
-    plt.xlim(2210,2857)
-    plt.ylim(2400,2700)
-    plt.show()
+    print(grid)
+    ##grid[2210:2270]
+    #print(grid.shape)
+    #plt.imshow(grid)
+    #plt.xlim(2210,2857)
+    #plt.ylim(2400,2700)
+    #plt.show()

@@ -38,4 +38,5 @@ WORKDIR ..
 
 RUN mkdir -p ~/catkin_ws/src
 ENV OsqpEigen_DIR=/osqp-eigen
+WORKDIR catkin_ws
 

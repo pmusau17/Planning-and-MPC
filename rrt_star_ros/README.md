@@ -6,4 +6,4 @@
 
 ![rrt_star_100_samples](rrt_100_samples.png "100 samples")
 
-![rrt_star_100_samples1](./images/rrt_100.png "Three Car Simulation")
+![rrt_star_100_samples1](rrt_100.png "Three Car Simulation")

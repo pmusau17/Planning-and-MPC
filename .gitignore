@@ -1,3 +1,4 @@
 # ignore compiled byte code
 *.pyc
 *.npy
+__pycache__

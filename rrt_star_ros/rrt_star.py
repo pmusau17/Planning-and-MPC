@@ -63,8 +63,11 @@ class RrtStar:
         # Iter-Max looks the number of samples described in sertac karaman's paper
         for k in range(self.iter_max):
             
-            # need to generate a random sample in the workspace
-            node_rand = self.generate_random_node(self.goal_sample_rate)
+            # generate a random sample in the workspace
+            # in this case only from the freespace points
+            #node_rand = self.generate_random_node(self.goal_sample_rate)
+
+            node_rand = self.generate_random_node_bias(self.goal_sample_rate)
 
             # find the nearest neighbor in the tree (probably euclidean)
             node_near = self.nearest_neighbor(self.list_of_vertices, node_rand)
@@ -103,7 +106,7 @@ class RrtStar:
             self.path = self.extract_path(self.list_of_vertices[index])
 
             # Plotting 
-            self.plotting.animation(self.list_of_vertices, self.path, "rrt*, N = " + str(self.iter_max),True)
+            #self.plotting.animation(self.list_of_vertices, self.path, "rrt*, N = " + str(self.iter_max),True)
 
 
 
@@ -121,6 +124,7 @@ class RrtStar:
         while node.parent is not None:
             path.append([node.x, node.y])
             node = node.parent
+            #print(node.x,node.y)
         path.append([node.x, node.y])
 
         return path
@@ -162,6 +166,7 @@ class RrtStar:
 
         # the new node's parent is the node with the minimum cost
         node_new.parent = self.list_of_vertices[cost_min_index]
+        node_new.cost = cost[int(np.argmin(cost))]
 
 
     """
@@ -196,6 +201,8 @@ class RrtStar:
         if len(node_index) > 0:
             cost_list = [dist_list[i] + self.cost(self.list_of_vertices[i]) for i in node_index
                          if not self.is_collision(self.list_of_vertices[i], self.s_goal)]
+            # cost_list = [dist_list[i] + self.list_of_vertices[i].cost for i in node_index
+            #              if not self.is_collision(self.list_of_vertices[i], self.s_goal)]
             if(len(cost_list)>0):
                 return node_index[int(np.argmin(cost_list))]
         
@@ -245,7 +252,10 @@ class RrtStar:
             # if the cost at the current vertex is greater when adding the new node
             # then we should rewire the tree by making this new node it's parent, thereby decreasing this path's length
             if self.cost(node_neighbor) > self.get_new_cost(node_new, node_neighbor):
-                node_neighbor.parent = node_new
+               node_neighbor.parent = node_new
+
+            # if node_neighbor.cost > self.get_new_cost(node_new, node_neighbor):
+            #     node_neighbor.parent = node_new
 
 
 
@@ -296,11 +306,40 @@ class RrtStar:
 
 
     """
+    This method should randomly sample the free space, and returns a viable point
+
+    Args:
+    Returns:
+    (x, y) (float float): a tuple representing the sampled point
+
+    """
+    def generate_random_node_bias(self,goal_sample_rate):
+
+
+        #x_index = int(round((self.s_goal.x- self.origin[0])/(self.res)))
+        #y_index = int(round((self.s_goal.y - self.origin[1])/(self.res)))
+        #print(self.s_start.x,self.s_start.y)
+        x_ind = np.where((self.x_free>=self.s_start.x-2.01) & (self.x_free<=self.s_start.x+2.01))[0]
+        y_ind = np.where((self.y_free>=self.s_start.y-2.01) &(self.y_free<=self.s_start.y+2.01))[0]
+        #print(x_ind,y_ind)
+        
+        self.x_free_bias = self.x_free[x_ind]
+        self.y_free_bias = self.y_free[y_ind]
+    
+        if np.random.random() > goal_sample_rate:
+            x = np.random.choice(self.x_free_bias)
+            y = np.random.choice(self.y_free_bias)
+            return Node((x,y))
+        return self.s_goal
+
+    """
         Function that returns new between two nodes, the cost of the starting node and the end node
     """
     def get_new_cost(self, node_start, node_end):
         dist, _ = self.get_distance_and_angle(node_start, node_end)
-
+        
+        # the new cost is the cost of this node plus the new distance
+        #return node_start.cost +dist 
         return self.cost(node_start) + dist
 
     """
@@ -332,7 +371,10 @@ class RrtStar:
         cost = 0.0
 
         while node.parent:
-            cost += math.hypot(node.x - node.parent.x, node.y - node.parent.y)
+
+            # Let's see 
+            #cost += math.hypot(node.x - node.parent.x, node.y - node.parent.y)
+            cost += node.cost
             node = node.parent
 
         return cost
@@ -351,10 +393,10 @@ if __name__ == "__main__":
     x_start = (0,0)
     x_goal = (1.422220,1.244794)
     grid = 'porto_grid.npy'
-    step_length = 0.10 
+    step_length = 0.30 
     goal_sample_rate = 0.10
     search_radius = 1.00
-    n_samples = 100
+    n_samples = 1000
 
     rrt_star = RrtStar(x_start, x_goal, step_length,goal_sample_rate, search_radius, n_samples,grid)
     rrt_star.planning()

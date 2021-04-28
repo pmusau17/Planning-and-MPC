@@ -38,6 +38,7 @@ class Plotting:
         self.y_obs = (item[1] * self.res) + self.origin[1]
         self.x_free = (item2[0] * self.res) + self.origin[0]
         self.y_free = (item2[1] * self.res) + self.origin[1]
+        self.count =0
     
         
         # get the start and goal
@@ -46,7 +47,7 @@ class Plotting:
     
     def animation(self,nodelist,path,name, animation=False,block=False):
         # plot the grid
-        self.ax.clear()
+        #self.ax.clear()
         self.plot_grid(name)
         # plot visited nodes
         self.plot_visited(nodelist, animation)
@@ -82,15 +83,18 @@ class Plotting:
         self.ax.plot(self.x_free,self.y_free,'y.',label="freespace")
 
         self.ax.plot(self.xI[0], self.xI[1], "bs", linewidth=3,label="init")
-        self.ax.plot(self.xG[0], self.xG[1], "gs", linewidth=3,label="goal")
+        self.ax.plot(self.xG[0], self.xG[1], "ms", linewidth=3,label="goal")
 
         # set equal aspect ratio for figures
         plt.xlabel("x(m)")
         plt.ylabel("y(m)")
         plt.title(name)
         plt.axis("equal")
-        plt.legend()
+        
         plt.show(block=block)
+        if(self.count<1):
+            plt.legend()
+        self.count+=1
 
 
     # Go through the list of nodes and connect each node to it's parent 

@@ -1,0 +1,16 @@
+<launch>
+
+   <!--Launch Move base and set up parameters-->
+   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find rsband_local_planner)/cfg/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+    <rosparam file="$(find rsband_local_planner)/cfg/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find rsband_local_planner)/cfg/local_costmap_param.yaml" command="load" />
+    <rosparam file="$(find rsband_local_planner)/cfg/global_costmap.yaml" command="load" /> 
+    <param name="base_local_planner" value="rsband_local_planner/RSBandPlannerROS"/>
+  </node>
+
+  <!--twist to ackermann-->
+  <!--generation of obtacles and visualization in rviz -->
+    <node pkg="rsband_local_planner" type="twist_to_ackermann.py" name="twist_to_ackermann" output="screen"/>
+
+</launch> 

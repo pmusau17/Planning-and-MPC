@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rsband_local_planner</name>
+  <version>0.0.0</version>
+  <description>
+    ROS local planner for car like and 4WS robots
+  </description>
+
+  <maintainer email="gkourosg@yahoo.gr">George Kouros</maintainer>
+
+  <license>BSD</license>
+
+  <url type="repository">https://github.com/gKouros/rsband_local_planner</url>
+  <url type="bugtracker">https://github.com/gKouros/rsband_local_planner/issues</url>
+
+  <author email="gkourosg@yahoo.gr">George Kouros</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>angles</depend>
+  <depend>base_local_planner</depend>
+  <depend>cmake_modules</depend>
+  <depend>costmap_2d</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>eband_local_planner</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_core</depend>
+  <depend>nav_msgs</depend>
+  <depend>ompl</depend>
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>tf_conversions</depend>
+  <depend>yaml-cpp</depend>
+
+  <export>
+    <nav_core plugin="${prefix}/blp_plugin.xml"/>
+  </export>
+
+</package>

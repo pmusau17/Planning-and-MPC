@@ -36,7 +36,18 @@ WORKDIR Catch2
 RUN cmake -Bbuild -H. -DBUILD_TESTING=OFF && cmake --build build/ --target install 
 WORKDIR ..
 
+
+RUN apt-get install ros-melodic-ompl && apt-get update && apt-get install ros-melodic-eband-local-planner
+
+RUN git clone https://github.com/fuzzylite/fuzzylite
+WORKDIR fuzzylite/fuzzylite
+RUN git checkout fuzzylite-6.x && mkdir build
+WORKDIR build
+RUN cmake .. && make && make install
+WORKDIR ../../..
+
 RUN mkdir -p ~/catkin_ws/src
 ENV OsqpEigen_DIR=/osqp-eigen
+RUN apt-get install ros-melodic-teb-local-planner
 WORKDIR catkin_ws
 

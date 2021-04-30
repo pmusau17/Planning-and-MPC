@@ -18,3 +18,7 @@ import plotting
 
 # import node from rrt_star (x,y,parent)
 from rrt_star import Node
+
+
+
+self.plotting = plotting.Plotting(grid,x_start,x_goal)

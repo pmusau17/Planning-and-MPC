@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import rospy
-from race.msg import drive_param
 from nav_msgs.msg import Odometry
+from nav_msgs.msg import Path
 from geometry_msgs.msg import Point
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
+from ackermann_msgs.msg import AckermannDriveStamped
 import math
 import numpy as np
 from numpy import linalg as la
@@ -15,7 +16,7 @@ import rospkg
 
 class pure_pursuit:
 
-    def __init__(self,racecar_name,waypoint_file):
+    def __init__(self,racecar_name='racecar',vesc_name='vesc'):
 
         # initialize class fields 
         self.racecar_name = racecar_name
@@ -29,15 +30,19 @@ class pure_pursuit:
 
         self.VELOCITY = 3.2 # m/s
         self.read_waypoints()
-       
         # Publisher for 'drive_parameters' (speed and steering angle)
-        self.pub = rospy.Publisher(racecar_name+'/drive_parameters', drive_param, queue_size=1)
+        self.pub = rospy.Publisher('/'+vesc_name+'/ackermann_cmd_mux/input/teleop', AckermannDriveStamped, queue_size=10)
         # Publisher for the goal point
         self.goal_pub = rospy.Publisher(racecar_name+'/goal_point', MarkerArray, queue_size="1")
         self.considered_pub= rospy.Publisher(racecar_name+'/considered_points', MarkerArray, queue_size="1")
         self.point_in_car_frame= rospy.Publisher(racecar_name+'/goal_point_car_frame', MarkerArray, queue_size="1")
+
         # Subscriber to vehicle position 
-        rospy.Subscriber(racecar_name+"/odom", Odometry, self.callback, queue_size=1)
+        rospy.Subscriber("move_base/RSBandPlannerROS/global_plan", Path, self.path_callback, queue_size=10)
+
+
+        # Subscriber to vehicle position 
+        # rospy.Subscriber(racecar_name+"/odom", Odometry, self.callback, queue_size=10)
 
     # Import waypoints.csv into a list (path_points)
     def read_waypoints(self):

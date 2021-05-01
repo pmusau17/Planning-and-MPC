@@ -14,7 +14,7 @@
 
 // std::string save_path; 
 // std::string save_path = ros::package::getPath("hmpc_auto_race")+"/waypoints/track_porto_xy.csv";
-std::string save_path = ros::package::getPath("hmpc_auto_race")+"/waypoints/track_porto_xyyaw.csv";
+std::string save_path = ros::package::getPath("hmpc_auto_race")+"/waypoints/track_porto_xyyaw_sampled.csv";
 // const string file_name = "/home/yuwei/rcws/logs/yuwei_wp.csv";
 const string file_name = save_path;
 const double RRT_INTERVAL = 0.1;

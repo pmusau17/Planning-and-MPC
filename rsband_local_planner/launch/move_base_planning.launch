@@ -10,7 +10,10 @@
   </node>
 
   <!--twist to ackermann-->
-  <!--generation of obtacles and visualization in rviz -->
-    <node pkg="rsband_local_planner" type="twist_to_ackermann.py" name="twist_to_ackermann" output="screen"/>
+  <!--generation of obtacles and visualization in rviz 
+    <node pkg="rsband_local_planner" type="twist_to_ackermann.py" name="twist_to_ackermann" output="screen"/>-->
+
+  <!--Trying pure pursuit with one of these pre-built path planners-->
+  <node pkg="rsband_local_planner" type="pure_pursuit.py" name="pure_pursuit" output="screen"/>
 
 </launch> 

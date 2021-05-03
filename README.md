@@ -11,7 +11,7 @@ This repository assumes that you have this [repo](https://github.com/pmusau17/Pl
 ### RRT* with biased sampling near the car
 ![RRT Biased](images/rrt_biased.gif)
 
-### Closer Look at Solution 
+### Closer Look at the "solution" 
 ![RRT_Grid](images/RRT_grid.png)
 
 ### Result after 2500 Samples:
@@ -25,7 +25,7 @@ This repository assumes that you have this [repo](https://github.com/pmusau17/Pl
 ![long_term_planning.gif](images/long_term_planning.gif)
 
 
-### Building the Docker Container
+# Building the Docker Container
 
 ```
 $ ./build_docker.sh

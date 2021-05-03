@@ -4,7 +4,8 @@ Let's see what we can learn about MPC and RRT*
 
 This repository assumes that you have this [repo](https://github.com/pmusau17/Platooning-F1Tenth) cloned and built. This repository contains implementations of planning algorithms for the F1Tenth Platform. I'm going to start writing tutorials on this as I learn. 
 
-### RRT* Random Sampling:
+
+# RRT*:
 ![RRT_Biased](images/rrt_normal.gif)
 
 ### RRT* with biased sampling near the car
@@ -16,10 +17,13 @@ This repository assumes that you have this [repo](https://github.com/pmusau17/Pl
 ### Result after 2500 Samples:
 ![Porto Grid](images/Porto2500.png)
 
-```
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
-wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-```
+# Rsband Local Planner + Pure Pursuit
+
+![Short Term Planning](images/short_term_planning.gif)
+
+
+![long_term_planning.gif](images/long_term_planning.gif)
+
 
 ### Building the Docker Container
 
@@ -43,7 +47,7 @@ and then launch the rsband_local_planner
 Launch the [F1Tenth Simulator](https://github.com/pmusau17/Platooning-F1Tenth): 
 
 ```
-roslaunch race sim_for_mpc.launch
+roslaunch race move_base_planning.launch
 ```
 
 In the docker terminal: 

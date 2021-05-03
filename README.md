@@ -11,7 +11,7 @@ This repository assumes that you have this [repo](https://github.com/pmusau17/Pl
 ### RRT* with biased sampling near the car
 ![RRT Biased](images/rrt_biased.gif)
 
-### Closer Look at Solution 
+### Closer Look at the "solution" 
 ![RRT_Grid](images/RRT_grid.png)
 
 ### Result after 2500 Samples:
@@ -19,13 +19,15 @@ This repository assumes that you have this [repo](https://github.com/pmusau17/Pl
 
 # Rsband Local Planner + Pure Pursuit
 
+The rsband_local_planner combines an elastic band planner, a reeds shepp planner and a fuzzy logic based path tracking controller, to achieve reactive local planning for Car-Like robots with Ackermann or 4-Wheel-Steering. Originally proposed by [George Kouros](https://github.com/gkouros/rsband_local_planner)
+
 ![Short Term Planning](images/short_term_planning.gif)
 
 
 ![long_term_planning.gif](images/long_term_planning.gif)
 
 
-### Building the Docker Container
+# Building the Docker Container
 
 ```
 $ ./build_docker.sh

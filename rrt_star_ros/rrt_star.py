@@ -393,7 +393,7 @@ if __name__ == "__main__":
     step_length = 0.30 
     goal_sample_rate = 0.10
     search_radius = 1.00
-    n_samples = 2000
+    n_samples = 100
 
     rrt_star = RrtStar(x_start, x_goal, step_length,goal_sample_rate, search_radius, n_samples,grid)
     rrt_star.planning()

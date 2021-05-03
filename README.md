@@ -2,7 +2,19 @@
 
 Let's see what we can learn about MPC and RRT*
 
-This repository assumes that you have this [repo](https://github.com/pmusau17/Platooning-F1Tenth) cloned and built. This repository contains implementations of planning algorithms for the F1Tenth Platform. I'm going to start writing tutorials on this as I learn. Planning is hard haha. 
+This repository assumes that you have this [repo](https://github.com/pmusau17/Platooning-F1Tenth) cloned and built. This repository contains implementations of planning algorithms for the F1Tenth Platform. I'm going to start writing tutorials on this as I learn. 
+
+### RRT* Random Sampling:
+![RRT_Biased](images/rrt_normal.gif)
+
+### RRT* with biased sampling near the car
+![RRT Biased](images/rrt_biased.gif)
+
+### Closer Look at Solution 
+![RRT_Grid](images/RRT_grid.png)
+
+### Result after 2500 Samples:
+![Porto Grid](images/Porto2500.png)
 
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'

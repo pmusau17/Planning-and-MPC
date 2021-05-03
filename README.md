@@ -19,6 +19,8 @@ This repository assumes that you have this [repo](https://github.com/pmusau17/Pl
 
 # Rsband Local Planner + Pure Pursuit
 
+The rsband_local_planner combines an elastic band planner, a reeds shepp planner and a fuzzy logic based path tracking controller, to achieve reactive local planning for Car-Like robots with Ackermann or 4-Wheel-Steering. Originally proposed by [George Kouros](https://github.com/gkouros/rsband_local_planner)
+
 ![Short Term Planning](images/short_term_planning.gif)
 
 

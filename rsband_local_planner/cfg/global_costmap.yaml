@@ -4,6 +4,13 @@ global_costmap:
   # The "update_frequency" parameter determines the frequency, in Hz, at which the costmap will run its update loop.
   update_frequency: 5.0
 
+  footprint: [[0.1125, 0.1125], [-0.1125, 0.1125], [-0.1125, -0.1125],[0.1125,-0.1125]]
+
   #The "static_map" parameter determines whether or not the costmap should initialize itself based on a map served by the map_server. 
   #If you aren't using an existing map or map server, set the static_map parameter to false.
-  static_map: true
+  #static_map: true
+  plugins:
+   - {name: static_layer, type: "costmap_2d::StaticLayer"}
+   - {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+   - {name: inflater_layer, type: "costmap_2d::InflationLayer"}
+  

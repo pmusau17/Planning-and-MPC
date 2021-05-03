@@ -39,6 +39,15 @@ $ catkin_make
 
 and then launch the rsband_local_planner 
 
+
+Launch the [F1Tenth Simulator](https://github.com/pmusau17/Platooning-F1Tenth): 
+
+```
+roslaunch race sim_for_mpc.launch
+```
+
+In the docker terminal: 
+
 ```
 $ roslaunch rsband_local_planner move_base_planning.launch
 ```

@@ -25,7 +25,7 @@ class Plotting:
     def __init__(self, grid_file,x_start,x_goal):
 
         # create the figure
-        self.fig, self.ax = plt.subplots()
+        self.fig, self.ax = plt.subplots(figsize=(20, 15))
 
         # the origin and res come from the map.yaml file
         self.origin= (-100,-100)

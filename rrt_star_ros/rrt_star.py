@@ -133,23 +133,20 @@ class RrtStar:
     """function that checks for collisions in the newly sampled point"""
     def is_collision(self,start_node,end_node):
 
-
+        bloat = 5
         # get the steps in the right direction
         x_len = end_node.x - start_node.x 
         y_len = end_node.y - start_node.y 
 
-        # discretize the path and check if any of the grid points are occupied 
-        for i in range(0,101):
-            
-            x = start_node.x + (0.01) * x_len
-            y = start_node.y + (0.01) * y_len
-            x_index = int(round((x - self.origin[0])/(self.res)))
-            y_index = int(round((y - self.origin[1])/(self.res)))
+        x_index = int(round((start_node.x  - self.origin[0])/(self.res)))
+        y_index = int(round((start_node.y  - self.origin[1])/(self.res)))
+        
+        # bloat each index and look 0.1 m (3*0.4) in either direction for an obstacle or freespace 
+        vals = self.grid[x_index-bloat:x_index+bloat+1,y_index-bloat:y_index+bloat+1].flatten()
 
-            # in the occupancy grid a value of 100 means occupied, -1 is unknown
-            # better to assume unknown is collision
-            if (self.grid[x_index][y_index]==100 or self.grid[x_index][y_index]==-1):
-                return True
+        # in the occupancy grid a value of 100 means occupied, -1 is unknown
+        if(100 in vals or -1 in vals):
+            return True
         return False
             
 
@@ -396,7 +393,7 @@ if __name__ == "__main__":
     step_length = 0.30 
     goal_sample_rate = 0.10
     search_radius = 1.00
-    n_samples = 1000
+    n_samples = 2000
 
     rrt_star = RrtStar(x_start, x_goal, step_length,goal_sample_rate, search_radius, n_samples,grid)
     rrt_star.planning()

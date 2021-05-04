@@ -1,34 +1,36 @@
 local_costmap:
+  #global_frame
   global_frame: racecar/odom
   robot_base_frame: racecar/base_link
+  plugins:
+   - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+   - {name: static_layer, type: "costmap_2d::StaticLayer"}
+   - {name: voxel_layer,      type: "costmap_2d::VoxelLayer"}
+   - {name: inflation_layer,     type: "costmap_2d::InflationLayer"}
   update_frequency: 5.0
   publish_frequency: 5.0
   transform_tolerance: 0.5 
+  track_unknown_space: false
   rolling_window: true
   footprint: [[0.1125, 0.1125], [-0.1125, 0.1125], [-0.1125, -0.1125],[0.1125,-0.1125]]
-  width: 3.0
-  height: 3.0
+  width: 6.0
+  height: 6.0
+
+
   # Note that its fine for the resolution of this grid to be different than the resolution of your static map, but most of the time we tend to set them equally.
-  resolution: 0.05
-  observation_sources: laser_scan_sensor 
-  laser_scan_sensor:
-    - sensor_frame: racecar/laser, 
-    - data_type: LaserScan, 
-    - topic: /racecar/filtered_scan, 
-    - marking: true, 
-    - clearing: true,
-    - obstacle_range: 2.5 
-    - raytrace_range: 3.0
-
-  inflater_layer:
-    - inflation_radius: 0.35
+  resolution: 0.04
+  obstacle_layer:
+    track_unknown_space: false
+    combination_method: 1
+    enabled: true
+    observation_sources: laser_scan_sensor 
+    laser_scan_sensor: {data_type: LaserScan, sensor_frame: racecar/laser, topic: racecar/filtered_scan, marking: true, clearing: false, obstacle_range: 2.5, raytrace_range: 3.0, observation_persistence: 0, min_obstacle_height: -5.01, max_obstacle_height: 5.01, inf_is_valid: true}
+  inflation_layer:
+    - inflation_radius: 0.55
     - cost_scaling_factor: 0.5
+  voxel_layer:
+    observation_sources: laser_scan_sensor 
+    laser_scan_sensor: {data_type: LaserScan, sensor_frame: racecar/laser, topic: racecar/filtered_scan, marking: true, clearing: false, obstacle_range: 2.5, raytrace_range: 3.0, observation_persistence: 0, min_obstacle_height: -5.01, max_obstacle_height: 5.01, inf_is_valid: true, origin_z: 0.0, z_resolution: 0.2, unknown_threshold: 9}
 
-#   static_map: false
 
-  plugins:
-   #- {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
-   #- {name: inflater_layer, type: "costmap_2d::InflationLayer"}
-   #- {name: static_layer, type: "costmap_2d::StaticLayer"}
-   - {name: obstacle_layer,      type: "costmap_2d::VoxelLayer"}
-   - {name: inflation_layer,     type: "costmap_2d::InflationLayer"}
+  

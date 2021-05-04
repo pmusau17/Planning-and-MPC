@@ -3,6 +3,7 @@
 import rospy
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped
 from visualization_msgs.msg import Marker
@@ -28,9 +29,10 @@ class BehaviouralLayer:
         self.xy_points = np.zeros((1,2))
         self.load_goals()
         self.tolerance = 1.0 
-        self.planning_horizon = 2.0
+        self.planning_horizon = 4.5
 
         rospy.Subscriber(racecar_name+"/odom", Odometry, self.odom_callback, queue_size=1)
+        rospy.Subscriber(racecar_name+'/scan', LaserScan, self.lidar_callback)
 
 
     def load_goals(self,path_file='track_porto_xy_sampled.csv'):
@@ -54,11 +56,12 @@ class BehaviouralLayer:
         curr_pos= np.asarray([x,y]).reshape((1,2))
         dist_arr = np.linalg.norm(self.xy_points-curr_pos,axis=-1)
         ##finding those points which are less than the look ahead distance (will be behind and ahead of the vehicle)
-        goal_arr = np.where((dist_arr > self.planning_horizon))[0]
+        goal_arr = np.where((dist_arr > self.planning_horizon) & (dist_arr<self.planning_horizon+3.0))[0]
         
         # finding the goal point which is within the goal points 
         pts = self.xy_points[goal_arr]
         pts_infrontofcar=[]
+        pts_angles = []
         for idx in range(len(pts)): 
             v1 = pts[idx] - curr_pos
             #since the euler was specified in the order x,y,z the angle is wrt to x axis
@@ -67,16 +70,23 @@ class BehaviouralLayer:
             angle= self.find_angle(v1,v2)
             if angle < np.pi/2:
                 pts_infrontofcar.append(pts[idx])
+                pts_angles.append(angle)
 
         pts_infrontofcar =np.asarray(pts_infrontofcar)
-        dist_arr = np.linalg.norm(pts_infrontofcar-curr_pos,axis=-1)- self.planning_horizon
-        
+        pts_angles = np.asarray(pts_angles)
+        dist_arr = np.linalg.norm(pts_infrontofcar-curr_pos,axis=-1)#- self.planning_horizon
+        print(pts_angles)
         # get the point closest to the lookahead distance
-        idx = np.argmin(dist_arr)
+        #idx = np.argmin(dist_arr)
+        idx = np.argmin(pts_angles)
 
         # goal point 
         goal_point = pts_infrontofcar[idx]
         return goal_point
+
+    def lidar_callback(self,data):
+        multiplier = min(data.ranges)*2
+        self.planning_horizon = max(multiplier,4.5)
 
 
 

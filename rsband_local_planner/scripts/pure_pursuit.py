@@ -162,7 +162,8 @@ class pure_pursuit:
                 self.const_speed(angle)
                 #self.set_speed(angle)
             except:
-                rospy.logwarn("No goal points ahead of the car")
+                pass
+                #rospy.logwarn("No goal points ahead of the car")
     
     # # USE THIS FUNCTION IF CHANGEABLE SPEED IS NEEDED
     # def set_speed(self,angle):

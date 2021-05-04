@@ -18,6 +18,8 @@
 
   <node pkg="rsband_local_planner" type="filter_scan.py" name="filtered_scan" output="screen"/>
 
+  <node pkg="rsband_local_planner" type="behavioral_layer.py" name="behavioral_layer" output="screen"/>
+
   <node pkg="rviz" type="rviz" name="rviz_display"  args="-d $(find rsband_local_planner)/rviz/move_base.rviz" output="log"/>-->
 
 </launch> 

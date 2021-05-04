@@ -14,10 +14,10 @@ local_costmap:
   laser_scan_sensor:
     - sensor_frame: racecar/laser, 
     - data_type: LaserScan, 
-    - topic: racecar/filtered_scan, 
+    - topic: /racecar/filtered_scan, 
     - marking: true, 
     - clearing: true,
-    - obstacle_range: 2.5, 
+    - obstacle_range: 2.5 
     - raytrace_range: 3.0
 
   inflater_layer:
@@ -27,6 +27,8 @@ local_costmap:
 #   static_map: false
 
   plugins:
-   - {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
-   - {name: inflater_layer, type: "costmap_2d::InflationLayer"}
-   - {name: static_layer, type: "costmap_2d::StaticLayer"}
+   #- {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+   #- {name: inflater_layer, type: "costmap_2d::InflationLayer"}
+   #- {name: static_layer, type: "costmap_2d::StaticLayer"}
+   - {name: obstacle_layer,      type: "costmap_2d::VoxelLayer"}
+   - {name: inflation_layer,     type: "costmap_2d::InflationLayer"}

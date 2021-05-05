@@ -12,18 +12,22 @@ from numpy import linalg as la
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 import csv
 import os
-import rospkg 
+import rospkg
+import tf2_ros
+import tf2_geometry_msgs
 
 class pure_pursuit:
 
-    def __init__(self,racecar_name='racecar',vesc_name='vesc'):
+    def __init__(self,racecar_name='racecar',vesc_name='vesc',path_type='locl'):
 
         # initialize class fields 
         self.racecar_name = racecar_name
+        self.path_type = path_type
         #self.waypoint_file = waypoint_file
 
         # pure pursuit parameters
-        self.LOOKAHEAD_DISTANCE = 1.1#1.70 # meters
+        self.LOOKAHEAD_DISTANCE = 0.7#1.0 # meters
+        self.LOOKAHEAD_WINDOW = 1.5
         
         # Distance from the 
         self.distance_from_rear_wheel_to_front_wheel = 0.5
@@ -36,28 +40,69 @@ class pure_pursuit:
         self.goal_pub = rospy.Publisher(racecar_name+'/goal_point', MarkerArray, queue_size="1")
         self.considered_pub= rospy.Publisher(racecar_name+'/considered_points', MarkerArray, queue_size="1")
         self.point_in_car_frame= rospy.Publisher(racecar_name+'/goal_point_car_frame', MarkerArray, queue_size="1")
+        self.tf_buffer = tf2_ros.Buffer()
+        self.listener = tf2_ros.TransformListener(self.tf_buffer)
 
         # Subscriber to vehicle position 
-        rospy.Subscriber("move_base/RSBandPlannerROS/global_plan", Path, self.path_callback, queue_size=10)
+        if(self.path_type=='local'):
+            rospy.Subscriber("move_base/RSBandPlannerROS/local_plan", Path, self.path_callback, queue_size=10)
+        else:
+            rospy.Subscriber("move_base/RSBandPlannerROS/global_plan", Path, self.global_path, queue_size=10)
+            rospy.Subscriber("move_base/RSBandPlannerROS/eband_plan", Path, self.path_callback, queue_size=10)
+        
 
         # path points 
         self.xy_points = []
+        self.global_xy_points = []
 
         # Subscriber to vehicle position 
         rospy.Subscriber(racecar_name+"/odom", Odometry, self.callback, queue_size=10)
 
-    # path callback message
-    def path_callback(self,path_msg):
+    # global path callback
+    def global_path(self,path_msg):
+        #print(path_msg)
         points = []
         # the poses have more than x and y but initially let's just play with those
         for ps in path_msg.poses:
             x = ps.pose.position.x
             y = ps.pose.position.y
             points.append([x,y])
+        self.global_xy_points = np.asarray(points).reshape((-1,2))
+
+
+
+    # path callback message
+    def path_callback(self,path_msg):
+        #print(path_msg)
+        points = []
+        # the poses have more than x and y but initially let's just play with those
+        for ps in path_msg.poses:
+            x = ps.pose.position.x
+            y = ps.pose.position.y
+            if(self.path_type=='local'):
+                transformed_point = self.transform_pose(ps.pose,'racecar/base_link','racecar/odom')
+                x = transformed_point.pose.position.x
+                y = transformed_point.pose.position.y
+            points.append([x,y])
 
         self.xy_points = np.asarray(points).reshape((-1,2))
         #print(self.xy_points.shape)
         self.visualize_point(points,self.considered_pub,count=100)
+
+
+    # Transform Listener for local plan 
+    def transform_pose(self,input_pose, from_frame, to_frame):
+        pose_stamped = tf2_geometry_msgs.PoseStamped()
+        pose_stamped.pose = input_pose
+        pose_stamped.header.frame_id = from_frame
+        pose_stamped.header.stamp = rospy.Time.now()
+        try:
+            output_pose_stamped = self.tf_buffer.transform(pose_stamped, to_frame, rospy.Duration(1))
+            return output_pose_stamped
+            #print(output_pose_stamped.pose)
+        except:
+            print("Did not work")
+
 
     
     # Visualize the path points
@@ -112,11 +157,16 @@ class pure_pursuit:
         ## finding the distance of each way point from the current position 
         curr_pos= np.asarray([x,y]).reshape((1,2))
 
-        if(len(self.xy_points)>5):
+        ## Sometimes the local path is empty
+        if(len(self.xy_points)<1):
+            self.xy_points = self.global_xy_points
+
+
+        if(len(self.xy_points)>1):
             dist_arr = np.linalg.norm(self.xy_points-curr_pos,axis=-1)
 
             ##finding those points which are less than the look ahead distance (will be behind and ahead of the vehicle)
-            goal_arr = np.where((dist_arr > self.LOOKAHEAD_DISTANCE) & (dist_arr<self.LOOKAHEAD_DISTANCE+0.3))[0]
+            goal_arr = np.where((dist_arr > self.LOOKAHEAD_DISTANCE) & (dist_arr<self.LOOKAHEAD_DISTANCE+self.LOOKAHEAD_WINDOW))[0]
             
             # finding the goal point which is within the goal points 
             pts = self.xy_points[goal_arr]
@@ -134,6 +184,7 @@ class pure_pursuit:
                     pts_infrontofcar.append(pts[idx])
 
             pts_infrontofcar =np.asarray(pts_infrontofcar)
+            # rospy.logwarn(str(pts_infrontofcar.shape))
             # compute new distances
 
             # if there are no more points in front of the car just stop
@@ -161,9 +212,12 @@ class pure_pursuit:
                 angle = math.atan2(ygv,xgv)
                 self.const_speed(angle)
                 #self.set_speed(angle)
-            except:
-                pass
+            except Exception as e:
+                print(e.message)
+                print("e")
                 #rospy.logwarn("No goal points ahead of the car")
+        else:
+            print(self.xy_points)
     
     # # USE THIS FUNCTION IF CHANGEABLE SPEED IS NEEDED
     # def set_speed(self,angle):

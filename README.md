@@ -40,7 +40,7 @@ $ ./run_docker.sh
 In the terminal launched by run_docker.sh, the first thing you will do is build the ros packages.
 
 ```
-$ catkin_make 
+$ source /opt/ros/melodic/setup.bash && catkin_make 
 ```
 
 and then launch the rsband_local_planner 

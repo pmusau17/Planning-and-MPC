@@ -26,11 +26,13 @@ The rsband_local_planner combines an elastic band planner, a reeds shepp planner
 ![long_term_planning.gif](images/long_term_planning.gif)
 
 
-# Building the Docker Container
+# Building the Docker Container For This Repo
 
 ```
 $ ./build_docker.sh
 ```
+
+Start the container by running: 
 
 ```
 $ ./run_docker.sh
@@ -42,31 +44,23 @@ In the terminal launched by run_docker.sh, the first thing you will do is build 
 $ source /opt/ros/melodic/setup.bash && catkin_make 
 ```
 
-and then launch the rsband_local_planner 
 
+The next thing to do is Launch the [F1Tenth Simulator](https://github.com/pmusau17/Platooning-F1Tenth): 
 
-Launch the [F1Tenth Simulator](https://github.com/pmusau17/Platooning-F1Tenth): 
-
-If you have the docker image built run the following 
+If you have the docker image built run the following:
 
 
 ```
 $ ./run_docker_simulator.sh
 ```
-In the docker terminal run: 
+Then run: 
 ```
-source devel/setup.bash && roslaunch race move_base_planning.launch
+$ source devel/setup.bash && roslaunch race move_base_planning.launch
 ```
 
 This should bring up a simulation of a racecar and some cones placed randomly throughout the racetrack. 
 
-In another terminal run:
-
-```
-$ ./run_docker.sh
-```
-
-In the docker terminal: 
+In the first docker terminal run:
 
 ```
 $ roslaunch rsband_local_planner move_base_planning.launch
@@ -75,5 +69,6 @@ $ roslaunch rsband_local_planner move_base_planning.launch
 This should launch the following rviz window: 
 
 ![following_local_plan](images/following_local_plan.gif)
+
 
 In the above gif, the plans are generated using the rsband local planner proposed by [George Kouros](https://github.com/gkouros/rsband_local_planner) and tracked using a [pure pursuit controller](rsband_local_planner/scripts/pure_pursuit.py). The goals are sent by a node that is a rough implementation of a behaviorial layer. The idea here is that whenever the car gets within a 1 m radius of the goal point we say that the plan has been executed and send the next goal point. The behavioral node implementation node can be found [here](rsband_local_planner/scripts/behavioral_layer.py). The costmaps used throught the planning are updated using the vehicle's lidar sensor and make use of the [move_base](http://wiki.ros.org/move_base) ros package. The configuration files (these were a paaaaaaiiiiin) can be found [here](https://github.com/pmusau17/Planning-and-MPC/tree/main/rsband_local_planner/cfg).

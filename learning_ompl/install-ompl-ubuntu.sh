@@ -128,7 +128,7 @@ done
 
 # the default version of Python in 17.10 and above is version 3
 if [[ $ubuntu_version > 1704 ]]; then
-    PYTHONV=2
+    PYTHONV=
 fi
 
 install_common_dependencies

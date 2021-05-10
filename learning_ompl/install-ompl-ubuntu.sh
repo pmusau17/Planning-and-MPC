@@ -3,7 +3,7 @@
 set -e
 
 if [ `id -u` == 0 ]; then
-    SUDO=''
+    SUDO=
     export DEBIAN_FRONTEND=noninteractive
     apt-get -y install lsb-release
 else

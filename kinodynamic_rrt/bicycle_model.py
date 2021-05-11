@@ -91,16 +91,51 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     
     # two second simulation 
-    T = 1
+    T = 0.3
     u = [1.0,0.266]
     u2 = [1.0,-0.266]
     u3 = [1.0,-0.61]
     u4 = [1.0,-0.61]
     dt = 0.05
 
-    s = State()
+    s = State(xs=[0,0,np.pi/2,0.1])
     num_primitives = 8
     traces = s.simulate_motion_primitives(T=T,num_primitives=num_primitives,throttle=1.0,dt=dt)
+    
+    pts = np.asarray([[trace[-1][0], trace[-1][1]] for trace in traces]).reshape((-1,2))
+    #print(pts)
+    node_end = np.asarray([1,1]).reshape((-1,2))
+    # compute the distances from each of the motion primitives
+    dist = np.linalg.norm((pts-node_end),axis=-1)
+    
+    index = dist.argmin()
+    nearest = pts[index]
+    
+    nearest_trace = traces[index]
+    print(nearest_trace[-1][:3])
+
+    # print(pts)
+
+    for pt in pts:
+         plt.plot(pt[0], pt[1],'.')
+    plt.plot(1, 1,'*')
+
+    for pt in nearest_trace:
+        plt.plot(pt[0], pt[1],'b.')
+
+    plt.plot(nearest[0],nearest[1],'r*')
+
+    # plt.xlabel("x (m)")
+    # plt.ylabel("y (m)")
+    # plt.axis("equal")
+    # plt.grid(True)
+    #plt.xlim(-1,1)
+    #plt.ylim(-1,1)
+    plt.show()
+
+
+
+
 
     for i in range(num_primitives):
         tr1 = traces[i]

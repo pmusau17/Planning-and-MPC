@@ -54,8 +54,6 @@ class Plotting:
         # plot the final path 
         self.plot_path(path,block=block)
 
-
-
     """
         I'm a visual learner so this method just shows me how points are sampled
     """

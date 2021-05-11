@@ -36,7 +36,6 @@ class RrtStar:
 
         # Initialize the list of vertices with the start point
         self.list_of_vertices = [self.s_start]
-
         # The path begins as an empty list
         self.path = []
 
@@ -106,7 +105,7 @@ class RrtStar:
             self.path = self.extract_path(self.list_of_vertices[index])
 
             # Plotting 
-            #self.plotting.animation(self.list_of_vertices, self.path, "rrt*, N = " + str(self.iter_max),True)
+            self.plotting.animation(self.list_of_vertices, self.path, "rrt*, N = " + str(self.iter_max),True)
 
 
 

@@ -90,14 +90,14 @@ class KinodynamicRRTStar:
             # get a new node and if the ray connecting the new node with near node 
             # is collision free then we can add the vertex to our list of nodes
             if node_new and not self.is_collision(node_near, node_new):
-
-                
                 # find the closest neighbors this is a list
                 #neighbor_indices = self.find_nearest_neighbors(node_new)
                 # append the new node
                 self.list_of_vertices.append(node_new)
+
+
             
-            
+            print(self.list_of_vertices)
                 # Plotting 
                 
                 #self.plotting.animation(self.list_of_vertices, self.path, "rrt*, N = " + str(self.iter_max),True)
@@ -161,12 +161,18 @@ class KinodynamicRRTStar:
 
         # get the point closest to the randomly sampled point
         index = dist.argmin()
-        nearest_trajectory = pts[index]
+        nearest_trajectory = primitives[index]
 
+        #print(nearest_trajectory)
+
+        print(pts[index],pts)
+        new_state =list(nearest_trajectory[-1][:3])+[self.min_speed]
+
+        print(new_state)
         # create the new node by selecting the last point in the trajectory
         # each trajectory technically has a speed but I think I just want to assume that each point has 
         # a speed equally to the minimum speed, not sure how this will work
-        node_new = Node(xs=[nearest_trajectory[-1][:3],self.min_speed])
+        node_new = Node(xs=new_state)
         
         # make the parent of this node the nearest node
         node_new.parent = node_start
@@ -222,14 +228,15 @@ class KinodynamicRRTStar:
 
 
 if __name__ == "__main__":
-    x_start = (0,0)
-    x_goal = (1.422220,1.244794)
+    x_start = (-0.006356, 0.030406, 0.322701, 0.1)
+    x_goal = (1.077466, 0.921832,0.750663, 0.1)
     grid = 'porto_grid.npy'
-    step_length = 0.30 
+    time_forward = 0.5
+    n_samples = 1
     goal_sample_rate = 0.10
-    search_radius = 1.00
-    n_samples = 100
+    throttle_speed = 0.3
+    number_of_motion_primitives = 5
 
-    rrt_star = RrtStar(x_start, x_goal, step_length,goal_sample_rate, search_radius, n_samples,grid)
-    rrt_star.planning()
-    rrt_star.plot_final()
+    kinodynamic_rrt = KinodynamicRRTStar(x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, n_samples,grid,min_speed=0.1)
+    kinodynamic_rrt.planning()
+    #rrt_star.plot_final()

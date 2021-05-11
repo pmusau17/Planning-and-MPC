@@ -146,12 +146,13 @@ RUN mkdir -p ~/catkin_ws/src
 ENV OsqpEigen_DIR=/osqp-eigen
 RUN apt-get install -y ros-melodic-teb-local-planner && apt-get install -y ros-melodic-rviz 
 
+#install pip
+RUN apt-get install -y software-properties-common && add-apt-repository main && apt-add-repository universe && add-apt-repository restricted && add-apt-repository multiverse &&  apt-get update -y && sudo apt install python2.7 && apt-get -y  install python-pip
 
-
-RUN apt-get install -y wget &&  wget https://ompl.kavrakilab.org/install-ompl-ubuntu.sh && chmod u+x install-ompl-ubuntu.sh && ./install-ompl-ubuntu.sh --python 
+RUN apt-get install -y wget && wget https://raw.githubusercontent.com/pmusau17/Planning-and-MPC/main/learning_ompl/install-ompl-ubuntu.sh && chmod u+x install-ompl-ubuntu.sh  && /bin/bash -c "./install-ompl-ubuntu.sh --python" 
 WORKDIR catkin_ws/
 
-# small details they often don't tell you I'm tirrrrreeeeeeed
+# # small details they often don't tell you I'm tirrrrreeeeeeed
 ENV PYTHONPATH="/ompl-1.5.2/py-bindings"
 
-CMD source /opt/ros/melodic/setup.bash
+# CMD source /opt/ros/melodic/setup.bash

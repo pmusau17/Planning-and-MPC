@@ -54,6 +54,18 @@ class Plotting:
         # plot the final path 
         self.plot_path(path,block=block)
 
+
+    def animation_all(self,nodelist,paths,name, animation=False,block=False):
+        # plot the grid
+        #self.ax.clear()
+        self.plot_grid(name)
+        # plot visited nodes
+        self.plot_visited(nodelist, animation)
+        # plot the final path 
+
+        for path in paths[:-1]:
+            self.plot_path(path,block=False,marker='--')
+        self.plot_path(paths[-1],block=block,marker='--')
     """
         I'm a visual learner so this method just shows me how points are sampled
     """
@@ -117,9 +129,9 @@ class Plotting:
 
     # plotting a path via list comprehensions
     #@staticmethod
-    def plot_path(self,path,block=False):
+    def plot_path(self,path,block=False,marker='-r'):
         if len(path) != 0:
-            self.ax.plot([x[0] for x in path], [x[1] for x in path], '-r', linewidth=2)
+            self.ax.plot([x[0] for x in path], [x[1] for x in path], marker, linewidth=2)
             plt.pause(0.01)
         plt.show(block=block)
 

@@ -264,7 +264,7 @@ class KinodynamicRRTStar:
         newest node.
 
     """
-    def search_goal_parent(self):
+    def search_goal_parent(self,all_paths=False):
         # create a list of distances to the goal
         # random sampling allows you to add a node to the tree more than once (need to figure out how to prevent that)
         # well we will only consider 
@@ -294,13 +294,16 @@ class KinodynamicRRTStar:
             # get the dist
             dist = math.hypot(node_new.x - self.s_goal.x, node_new.y - self.s_goal.y)
             dists.append(dist)
-        index = np.asarray(dists).argmin()
-        node = candidates[index]
-
-        if(len(candidates)>0):
+        print(dists)
+        
+        
+        path =[]
+        if(len(candidates)>0 and not all_paths):
+            index = np.asarray(dists).argmin()
+            node = candidates[index]
             path = self.extract_path(node)
         
-        return path
+        return path,candidates
 
 
     """
@@ -309,7 +312,7 @@ class KinodynamicRRTStar:
     def plot_final(self):
         
         # get the index of the closest point to the goal
-        self.path = self.search_goal_parent()
+        self.path,_ = self.search_goal_parent()
 
 
         # get the path
@@ -318,6 +321,26 @@ class KinodynamicRRTStar:
         # get the index of the minimum cost vertex within a step length of the goal 
         self.plotting.animation(self.list_of_vertices, self.path, "Porto Final Solution, N={}".format(self.iter_max),True,True)
 
+    """ 
+        Function that plots each of the paths
+    """
+    """
+        Function that plots final solution obtained
+    """
+    def plot_final_all(self):
+        
+        # get the index of the closest point to the goal
+        self.path,candidates = self.search_goal_parent(all_paths=True)
+        paths = []
+        for node in candidates:
+            path = self.extract_path(node)
+            paths.append(path)
+        # get the path
+        # self.path = self.extract_path([])
+
+        # get the index of the minimum cost vertex within a step length of the goal 
+        self.plotting.animation_all(self.list_of_vertices, paths, "All paths Porto Final Solution, N={}".format(self.iter_max),True,True)
+
 
 
 if __name__ == "__main__":
@@ -325,7 +348,7 @@ if __name__ == "__main__":
     x_goal = (1.077466, 0.921832,0.750663, 0.1)
     grid = 'porto_grid.npy'
     time_forward = 0.2
-    n_samples = 1000
+    n_samples = 100
     goal_sample_rate = 0.10
     throttle_speed = 0.3
     number_of_motion_primitives = 5
@@ -333,3 +356,5 @@ if __name__ == "__main__":
     kinodynamic_rrt = KinodynamicRRTStar(x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, n_samples,grid,min_speed=0.1)
     kinodynamic_rrt.planning()
     kinodynamic_rrt.plot_final()
+    #kinodynamic_rrt.plot_final_all()
+

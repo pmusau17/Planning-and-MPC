@@ -104,7 +104,7 @@ class Plotting:
             for node in nodelist:
                 count += 1
                 if node.parent:
-                    self.ax.plot([node.parent.x, node.x], [node.parent.y, node.y], "-g")
+                    self.ax.plot([node.parent.x, node.x], [node.parent.y, node.y], "-.g")
                     plt.gcf().canvas.mpl_connect('key_release_event',
                                                  lambda event:
                                                  [exit(0) if event.key == 'escape' else None])
@@ -113,7 +113,7 @@ class Plotting:
         else:
             for node in nodelist:
                 if node.parent:
-                    plt.plot([node.parent.x, node.x], [node.parent.y, node.y], "-g")
+                    plt.plot([node.parent.x, node.x], [node.parent.y, node.y], "-.g")
 
     # plotting a path via list comprehensions
     #@staticmethod

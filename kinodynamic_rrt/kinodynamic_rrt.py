@@ -76,7 +76,7 @@ class KinodynamicRRTStar:
             # in this case only from the freespace points
             node_rand = self.generate_random_node(self.goal_sample_rate)
 
-            # find the nearest neighbor in the tree (probably euclidean)
+            # find the nearest neighbor in the tree (euclidean distance for now)
             node_near = self.nearest_neighbor(self.list_of_vertices, node_rand)
 
             # This is like a steering function, this is where the kinodynamic simulation occurs
@@ -94,10 +94,15 @@ class KinodynamicRRTStar:
                 #neighbor_indices = self.find_nearest_neighbors(node_new)
                 # append the new node
                 self.list_of_vertices.append(node_new)
-
-
             
-            print(self.list_of_vertices)
+
+            # get the index of the minimum cost vertex within a step length of the goal 
+            #index = self.search_goal_parent()
+            #self.path = self.extract_path([])
+            # Plotting 
+            #self.plotting.animation(self.list_of_vertices, self.path, "Kinodynamic rrt*, N = " + str(self.iter_max),True)
+            
+            #print(self.list_of_vertices)
                 # Plotting 
                 
                 #self.plotting.animation(self.list_of_vertices, self.path, "rrt*, N = " + str(self.iter_max),True)
@@ -165,10 +170,13 @@ class KinodynamicRRTStar:
 
         #print(nearest_trajectory)
 
-        print(pts[index],pts)
+        #print(pts[index],pts)
+
+        # use the first three elements of the state with a minimum speed of 0.3 
+        # so that the forward projection moves faster
         new_state =list(nearest_trajectory[-1][:3])+[self.min_speed]
 
-        print(new_state)
+        #print(new_state)
         # create the new node by selecting the last point in the trajectory
         # each trajectory technically has a speed but I think I just want to assume that each point has 
         # a speed equally to the minimum speed, not sure how this will work
@@ -227,16 +235,101 @@ class KinodynamicRRTStar:
         return dist_table_index
 
 
+    """ starting from the vertex that has been identified as closest the goal work backwards.
+    """
+    def extract_path(self, node_end):
+        
+        # last node in the path is the goal node
+        path = [[self.s_goal.x, self.s_goal.y]]
+        node = node_end
+        
+        # from this node ask for parents
+        while node.parent is not None:
+           path.append([node.x, node.y])
+           node = node.parent
+           #print(node.x,node.y)
+        path.append([node.x, node.y])
+
+        return path
+
+
+
+
+
+
+    """
+        This is another function that can benefit from a vectorized implementation
+        It computes the distance to each vertex within the tree and either returns the vertex
+        that is within a step radius of the goal and has a minimum cost or the index of the 
+        newest node.
+
+    """
+    def search_goal_parent(self):
+        # create a list of distances to the goal
+        # random sampling allows you to add a node to the tree more than once (need to figure out how to prevent that)
+        # well we will only consider 
+        candidates =[]
+        check_for_redundant = []
+        for n in self.list_of_vertices:
+            dist = math.hypot(n.x - self.s_goal.x, n.y - self.s_goal.y)
+            if(dist <= self.step_len and n not in candidates):
+                if((n.x,n.y,n.yaw) in check_for_redundant):
+                    continue
+                else:
+                    candidates.append(n)
+                    check_for_redundant.append((n.x,n.y,n.yaw))
+
+
+        if(len(candidates)==0):
+             print("No path found yet.")
+        else:
+             print("Path Found: Nodes within one step:",len(candidates))
+
+        # get the node that is the closest to the goal when we simulate one more step
+        dists = []
+        for node in candidates:
+            # generate another state
+            node_new, _ = self.new_state(node, self.s_goal)
+
+            # get the dist
+            dist = math.hypot(node_new.x - self.s_goal.x, node_new.y - self.s_goal.y)
+            dists.append(dist)
+        index = np.asarray(dists).argmin()
+        node = candidates[index]
+
+        if(len(candidates)>0):
+            path = self.extract_path(node)
+        
+        return path
+
+
+    """
+        Function that plots final solution obtained
+    """
+    def plot_final(self):
+        
+        # get the index of the closest point to the goal
+        self.path = self.search_goal_parent()
+
+
+        # get the path
+        # self.path = self.extract_path([])
+
+        # get the index of the minimum cost vertex within a step length of the goal 
+        self.plotting.animation(self.list_of_vertices, self.path, "Porto Final Solution, N={}".format(self.iter_max),True,True)
+
+
+
 if __name__ == "__main__":
     x_start = (-0.006356, 0.030406, 0.322701, 0.1)
     x_goal = (1.077466, 0.921832,0.750663, 0.1)
     grid = 'porto_grid.npy'
-    time_forward = 0.5
-    n_samples = 1
+    time_forward = 0.2
+    n_samples = 1000
     goal_sample_rate = 0.10
     throttle_speed = 0.3
     number_of_motion_primitives = 5
 
     kinodynamic_rrt = KinodynamicRRTStar(x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, n_samples,grid,min_speed=0.1)
     kinodynamic_rrt.planning()
-    #rrt_star.plot_final()
+    kinodynamic_rrt.plot_final()

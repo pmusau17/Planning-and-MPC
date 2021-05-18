@@ -100,8 +100,10 @@ class KinodynamicRRTStar:
 
             # get a new node and if the ray connecting the new node with near node 
             # is collision free then we can add the vertex to our list of nodes
-            if node_new and not self.is_collision(node_near, node_new) and add:
-
+            # Select the next line of code depending on the fidelity of the collision checking
+            # The first checks the whole trajectory, the second checks the whole trace.
+            #if node_new and not self.is_collision(node_near, node_new) and add:
+            if node_new and not self.is_collision_trajectory(trace_trajectory) and add:
                 # if the path is not in collision 
                 self.list_of_vertices.append(node_new)
                 self.list_of_xys.append(point)
@@ -210,7 +212,7 @@ class KinodynamicRRTStar:
     """function that checks for collisions in the newly sampled point,
        In this case we can use the trajectory that was used in the euler simulation.
        This currently naive because it just checks if the end point is in collision, which is fine 
-       if the step size is small but not correct if not
+       if the step size is small but not correct if not. It's fast though haha
        
        """
     def is_collision(self,start_node,end_node):
@@ -226,6 +228,26 @@ class KinodynamicRRTStar:
         if(100 in vals or -1 in vals):
             return True
         return False
+
+
+    """function that checks for collisions in the newly sampled point,
+       In this case we are checking the whole trace so this is more correct but it's probably slower
+    """
+    def is_collision_trajectory(self,trajectory):
+        bloat=2 
+        for pt in trajectory:
+            x_index = int(round((pt[0]  - self.origin[0])/(self.res)))
+            y_index = int(round((pt[1]  - self.origin[1])/(self.res)))
+            # bloat each index and look 0.1 m (3*0.4) in either direction for an obstacle or freespace 
+            vals = self.grid[x_index-bloat:x_index+bloat+1,y_index-bloat:y_index+bloat+1].flatten()
+            # in the occupancy grid a value of 100 means occupied, -1 is unknown
+            if(100 in vals or -1 in vals):
+                return True
+        return False
+    
+
+
+    
 
 
     """

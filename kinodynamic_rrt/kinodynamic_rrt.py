@@ -27,9 +27,12 @@ class Node(object):
 # max number of iterations
 
 class KinodynamicRRTStar:
-    def __init__(self, x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, iter_max,grid,min_speed=0.1):
+    def __init__(self, x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, iter_max,grid,min_speed=0.1,rrt_star=False):
+        self.rrt_star  = rrt_star
         self.s_start = Node(x_start)
         self.s_goal = Node(x_goal)
+        if(self.rrt_star):
+            self.s_start.cost = 0
 
         # Define the parameters for rrt
 
@@ -46,6 +49,9 @@ class KinodynamicRRTStar:
 
         # Initialize the list of vertices with the start point
         self.list_of_vertices = [self.s_start]
+
+        # This prevents duplicate nodes from being added:
+        self.list_of_xys = []
 
         # The path begins as an empty list
         self.path = []
@@ -87,13 +93,18 @@ class KinodynamicRRTStar:
                 print("Sample Number: ",k,"Number of vertices",len(self.list_of_vertices))
 
 
+            ## check if this point is already in the tree
+            point = (node_new.x,node_new.y)
+            add = not point in self.list_of_xys
+
+
             # get a new node and if the ray connecting the new node with near node 
             # is collision free then we can add the vertex to our list of nodes
-            if node_new and not self.is_collision(node_near, node_new):
-                # find the closest neighbors this is a list
-                #neighbor_indices = self.find_nearest_neighbors(node_new)
-                # append the new node
+            if node_new and not self.is_collision(node_near, node_new) and add:
+
+                # if the path is not in collision 
                 self.list_of_vertices.append(node_new)
+                self.list_of_xys.append(point)
             
 
             # get the index of the minimum cost vertex within a step length of the goal 
@@ -168,6 +179,10 @@ class KinodynamicRRTStar:
         index = dist.argmin()
         nearest_trajectory = primitives[index]
 
+        # get the distance here too
+        if(self.rrt_star):
+            new_dist = dist[index]
+
         #print(nearest_trajectory)
 
         #print(pts[index],pts)
@@ -181,6 +196,9 @@ class KinodynamicRRTStar:
         # each trajectory technically has a speed but I think I just want to assume that each point has 
         # a speed equally to the minimum speed, not sure how this will work
         node_new = Node(xs=new_state)
+
+        if(self.rrt_star):
+            node_new.cost = node_start.cost + new_dist 
         
         # make the parent of this node the nearest node
         node_new.parent = node_start
@@ -190,7 +208,11 @@ class KinodynamicRRTStar:
 
 
     """function that checks for collisions in the newly sampled point,
-       In this case we can use the trajectory that was used in the euler simulation"""
+       In this case we can use the trajectory that was used in the euler simulation.
+       This currently naive because it just checks if the end point is in collision, which is fine 
+       if the step size is small but not correct if not
+       
+       """
     def is_collision(self,start_node,end_node):
 
         bloat =5 
@@ -267,6 +289,7 @@ class KinodynamicRRTStar:
     def search_goal_parent(self,all_paths=False):
         # create a list of distances to the goal
         # random sampling allows you to add a node to the tree more than once (need to figure out how to prevent that)
+        # did that I can now change this to be simpler
         # well we will only consider 
         candidates =[]
         check_for_redundant = []
@@ -347,13 +370,15 @@ if __name__ == "__main__":
     x_start = (-0.006356, 0.030406, 0.322701, 0.1)
     x_goal = (1.077466, 0.921832,0.750663, 0.1)
     grid = 'porto_grid.npy'
-    time_forward = 0.2
-    n_samples = 100
+    time_forward = 0.3
+    n_samples = 10000
     goal_sample_rate = 0.10
     throttle_speed = 0.3
     number_of_motion_primitives = 5
 
+    # RRT or RRT*
     kinodynamic_rrt = KinodynamicRRTStar(x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, n_samples,grid,min_speed=0.1)
+    #kinodynamic_rrt = KinodynamicRRTStar(x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, n_samples,grid,min_speed=0.1,rrt_star=True)
     kinodynamic_rrt.planning()
     kinodynamic_rrt.plot_final()
     #kinodynamic_rrt.plot_final_all()

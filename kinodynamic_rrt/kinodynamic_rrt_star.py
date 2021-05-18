@@ -107,6 +107,17 @@ class KinodynamicRRTStar:
                 # if the path is not in collision 
                 self.list_of_vertices.append(node_new)
                 self.list_of_xys.append(point)
+                
+                # get the neigbors within a particular radius of the sample
+
+                neighbor_indices  = self.find_nearest_neighbors(node_new)
+
+                # if there are nodes within that radius consider if we should re-wire the tree
+                if neighbor_indices:
+                    # choose the parent node from the list of neighbors
+                    # and rewire the tree
+                    self.rewire(node_new,neighbor_indices)
+                    
             
 
             # get the index of the minimum cost vertex within a step length of the goal 
@@ -389,6 +400,7 @@ class KinodynamicRRTStar:
 
 
 if __name__ == "__main__":
+    # These are x,y,yaw,speed
     x_start = (-0.006356, 0.030406, 0.322701, 0.1)
     x_goal = (1.077466, 0.921832,0.750663, 0.1)
     grid = 'porto_grid.npy'
@@ -398,8 +410,8 @@ if __name__ == "__main__":
     throttle_speed = 0.3
     number_of_motion_primitives = 5
 
-    # RRT
-    kinodynamic_rrt = KinodynamicRRTStar(x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, n_samples,grid,min_speed=0.1)
+    # RRT*
+    kinodynamic_rrt = KinodynamicRRTStar(x_start, x_goal, time_forward,goal_sample_rate, throttle_speed, number_of_motion_primitives, n_samples,grid,min_speed=0.1,rrt_star=True)
     kinodynamic_rrt.planning()
     kinodynamic_rrt.plot_final()
     #kinodynamic_rrt.plot_final_all()

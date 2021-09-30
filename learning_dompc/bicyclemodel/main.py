@@ -184,12 +184,13 @@ class BicycleMPC:
         mpc_graphics = do_mpc.graphics.Graphics(self.mpc.data)
         sim_graphics = do_mpc.graphics.Graphics(self.simulator.data)
 
+        inputs = []
+        states = []
         for k in range(self.n_steps):
             u0 = self.mpc.make_step(self.x0)
+            inputs.append(u0)
             y_next = self.simulator.make_step(u0)
             x0 = self.estimator.make_step(y_next)
-
-        print(x0)
 
 
         fig, ax = plt.subplots(6, sharex=True, figsize=(16,9))
@@ -235,5 +236,5 @@ if __name__ == "__main__":
     # line 119 track_porto_26780.csv
     x0 = np.asarray([0.958413,0.810734,0.750340,1.003465])
     xt = [1.567785, 1.381567, 0.754297, 0.999855]
-    bmpc = BicycleMPC(x0,xt[0],xt[1],n_steps=20).run_closedloop()
+    bmpc = BicycleMPC(x0,xt[0],xt[1],n_steps=20,static_plot=True).run_closedloop()
 

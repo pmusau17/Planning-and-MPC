@@ -9,7 +9,10 @@ The considered model of the batch bioreactor is continuous and has 4 states and 
 
 import numpy as np
 import sys
+
+#CasADi is an open-source software tool for numerical optimization in general and optimal control (i.e. optimization involving differential equations) in particular. 
 from casadi import *
+
 
 # Import do_mpc package:
 import do_mpc

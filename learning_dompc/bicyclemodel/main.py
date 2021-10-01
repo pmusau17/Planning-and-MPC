@@ -192,7 +192,7 @@ class BicycleMPC:
             y_next = self.simulator.make_step(u0)
             x0 = self.estimator.make_step(y_next)
 
-
+        print(inputs)
         fig, ax = plt.subplots(6, sharex=True, figsize=(16,9))
         fig.align_ylabels()
 
